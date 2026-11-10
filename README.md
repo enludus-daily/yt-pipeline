@@ -82,6 +82,8 @@ DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion."
   VO=work/vo-d .venv/bin/python daily/compose.py work/daily/<repo>/demo.mp4 work/daily/<repo>/icon.png work/daily-out
 ```
 
+シリーズの日付は `daily/series.json`（Day 1 = タマヘビ、そのあとの毎日のアプリが Day 2, 3, …）。
+
 構成：つかみ（DAY N と、困りごと／組み合わせの 1 行）3 秒 → デモ（上に「Day N: 名前」「Built by AI in ~1 day」）→ アプリの紹介（アイコン・名前・ストア・「Day N+1 は明日」）3 秒。HOOK・TAGLINE はアプリごとに README と daily-ideas の Issue から英語で書く（同じ文の使い回しをしない）。
 
 ## 投稿
