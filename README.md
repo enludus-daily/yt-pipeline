@@ -6,7 +6,7 @@
 
 | シリーズ | 中身 | 状態 |
 |---|---|---|
-| **AI ships an app a day** | enludus-daily で毎日作るアプリを 1 本ずつ紹介（困りごと → AI が 1 日で作った解決策） | 準備中（アプリ側の英語対応と `-demo` 起動引数を daily-app-template の手順書に追加済み） |
+| **AI ships an app a day** | enludus-daily で毎日作るアプリを 1 本ずつ紹介（困りごと → AI が 1 日で作った解決策） | 合成できる（`daily/`）。2026-11-10 夜のアプリから、CI がデモを録る |
 | **Can you beat the bot?**（五十音マインスイーパー） | 英語 A〜Z 盤でボットと対戦。止めて「Pause & guess!」→ 答え | 試作できた（`gojuon/`） |
 
 ## 構成
@@ -68,6 +68,21 @@ Playwright と Chromium が要る（クラウドのセッションには入っ�
    ```bash
    .venv/bin/python common/upload.py output/gojuon-14-ketchup.mp4 examples/gojuon-14-ketchup.json
    ```
+
+## AI ships an app a day（`daily/`）
+
+毎日のアプリは、CI（daily-actions の ios-ci、`demo-video: en`）が起動引数 `-demo` の再生を英語で録画し、artifact `demo-video` に置く（daily-app-template が 2026-11-10 から有効）。
+
+```bash
+daily/fetch_demo.sh app-20261111-xxxx        # → work/daily/<repo>/demo.mp4・icon.png・README.md（gh のサインインが要る）
+common/tts.sh work/vo-d/hook.wav  "Snake, but your body is the billiard cushion."
+common/tts.sh work/vo-d/demo.wav  "Day 24. An AI built this iPhone game in one day."
+common/tts.sh work/vo-d/outro.wav "Follow along for tomorrow's app."
+DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion." TAGLINE="A physics puzzle for iPhone" \
+  VO=work/vo-d .venv/bin/python daily/compose.py work/daily/<repo>/demo.mp4 work/daily/<repo>/icon.png work/daily-out
+```
+
+構成：つかみ（DAY N と、困りごと／組み合わせの 1 行）3 秒 → デモ（上に「Day N: 名前」「Built by AI in ~1 day」）→ アプリの紹介（アイコン・名前・ストア・「Day N+1 は明日」）3 秒。HOOK・TAGLINE はアプリごとに README と daily-ideas の Issue から英語で書く（同じ文の使い回しをしない）。
 
 ## 投稿
 
