@@ -18,7 +18,9 @@ common/tts.sh         英語のナレーション（Piper、en_US-ryan-high。�
 gojuon/compose.py     つかみ → プレイ → 一時停止（Pause & guess! → 3・2・1 の声と音）→ 答え → アプリの紹介、をゲームの BGM 付きで合成
 gojuon/make_short.sh  上をまとめて 1 本作る
 assets/gojuon-sounds/ アプリの BGM・効果音（アプリの scripts/sounds/make_sounds.py で一から合成したもの。権利の問題なし）
-examples/             投稿用のタイトル・説明文・タグの例
+common/upload.py      YouTube Data API でアップロード（--auth で最初のサインイン、--dry-run で中身の確認）
+examples/             投稿用のメタデータの例（.json は upload.py が読む）
+docs/youtube-api-audit.md  API の審査の手順・Cloud Console のリンク・フォームの答えの下書き
 ```
 
 画像生成（タイトルカード・サムネイル）は自宅 PC の Codex CLI で行う予定（ChatGPT のサブスクのログインを保つため）。
@@ -60,10 +62,14 @@ Playwright と Chromium が要る（クラウドのセッションには入っ�
    - `R1`（13.4）：結果の画面の終わり
    - 時刻は `MARK` の行を見て決め、`work/out/` のコマ（`ffmpeg -ss <秒> -i work/rec.mp4 -frames:v 1 x.png`）で確かめる
 
-3. `output/` の mp4 と、`examples/` に倣ったタイトル・説明文で投稿する。
+3. `output/` の mp4 と、`examples/*.json` に倣ったメタデータで投稿する：
+
+   ```bash
+   .venv/bin/python common/upload.py output/gojuon-14-ketchup.mp4 examples/gojuon-ketchup-short.json
+   ```
 
 ## 投稿
 
-- YouTube Data API の審査（audit）が通るまで、API で上げた動画は非公開に固定され、公開に切り替えられない。それまでは **YouTube Studio から手で上げる**。
+- YouTube Data API の審査（audit）が通るまで、API で上げた動画は非公開に固定され、公開に切り替えられない。それまでは **YouTube Studio から手で上げる**。手順と申請の下書きは `docs/youtube-api-audit.md`。
 - 合成音声は自分の台本を読んでいるだけで、実在の人物を模したものではない。実際のゲーム画面なので「改変または合成されたコンテンツ」の申告は不要（現実と見分けがつかない人物・出来事を作った場合だけ必要）。
 - 同じ型の量産は YouTube の inauthentic content に当たりやすい。お題・つかみの文・見せ方を毎回変える。
