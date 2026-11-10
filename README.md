@@ -15,8 +15,9 @@
 gojuon/record.js      Web 版をブラウザで自動操作し、乱数を固定したボット対戦を 1080x1920 で録る（frames/ と times.json）
 common/frames_to_video.py  録った frames を 30fps の mp4 にする
 common/tts.sh         英語のナレーション（Piper、en_US-ryan-high。初回に声のモデルをダウンロード）
-gojuon/compose.py     つかみ → プレイ → 一時停止のカウントダウン → 答え → アプリの紹介、を合成
+gojuon/compose.py     つかみ → プレイ → 一時停止（Pause & guess! → 3・2・1 の声と音）→ 答え → アプリの紹介、をゲームの BGM 付きで合成
 gojuon/make_short.sh  上をまとめて 1 本作る
+assets/gojuon-sounds/ アプリの BGM・効果音（アプリの scripts/sounds/make_sounds.py で一から合成したもの。権利の問題なし）
 examples/             投稿用のタイトル・説明文・タグの例
 ```
 

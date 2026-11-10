@@ -51,7 +51,8 @@ def frame_overlay(name, caption, sub=None, big=None):
     im.save(p(name))
 
 frame_overlay("ov_game.png", "Can you beat the bot?", CLUE)
-for i, n in enumerate(["3", "2", "1"]):
+frame_overlay("ov_pause.png", "Pause & guess!", CLUE)
+for n in "321":
     frame_overlay(f"ov_pause{n}.png", f"Pause & guess!  {n}", CLUE)
 frame_overlay("ov_result.png", "The bot got it!", None, (ANSWER, "Did you beat it?"))
 
@@ -83,20 +84,41 @@ def game(ss, to, ov, out, freeze=False):
 
 still(p("hook.png"), 2.8, p("s1.mp4"))
 game(G0, GF, p("ov_game.png"), p("s2.mp4"))
+game(0, 1.0, p("ov_pause.png"), p("s3_go.mp4"), freeze=True)
 for n in "321": game(0, 1.0, p(f"ov_pause{n}.png"), p(f"s3_{n}.mp4"), freeze=True)
 game(GF + 0.1, R1, p("ov_result.png"), p("s4.mp4"))
 still(p("outro.png"), 2.8, p("s5.mp4"))
-parts = ["s1", "s2", "s3_3", "s3_2", "s3_1", "s4", "s5"]
+parts = ["s1", "s2", "s3_go", "s3_3", "s3_2", "s3_1", "s4", "s5"]
 open(p("list.txt"), "w").write("".join(f"file '{x}.mp4'\n" for x in parts))
 run("ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", p("list.txt"), "-c", "copy", p("video.mp4"))
 
-# narration timeline
-d2, d3 = GF - G0, 3.0
-t = {"hook": 0.25, "game": 2.8 + 0.3, "pause": 2.8 + d2 + 0.1, "reveal": 2.8 + d2 + d3 + 0.3, "outro": 2.8 + d2 + d3 + (R1 - GF - 0.1) + 0.3}
-ins, flt = [], []
-for i, (k, s) in enumerate(t.items()):
-    ins += ["-i", os.path.join(VO, f"{k}.wav")]; flt.append(f"[{i+1}:a]adelay={int(s*1000)}|{int(s*1000)}[a{i}]")
-flt.append("".join(f"[a{i}]" for i in range(len(t))) + f"amix=inputs={len(t)}:normalize=0,apad[a]")
+# audio: narration + in-game sounds (synthesized by the app's scripts/sounds/make_sounds.py)
+SND = os.environ.get("SOUNDS", os.path.join(os.path.dirname(__file__), "..", "assets", "gojuon-sounds"))
+d2, d3 = GF - G0, 4.0
+t_pause = 2.8 + d2; t_reveal = t_pause + d3; t_outro = t_reveal + (R1 - GF - 0.1)
+cues = [  # (file, start seconds, volume)
+    (os.path.join(VO, "hook.wav"), 0.25, 1.0),
+    (os.path.join(VO, "game.wav"), 2.8 + 0.3, 1.0),
+    (os.path.join(VO, "pause.wav"), t_pause + 0.05, 1.0),
+    (os.path.join(VO, "three.wav"), t_pause + 1.0, 1.0),
+    (os.path.join(VO, "two.wav"), t_pause + 2.0, 1.0),
+    (os.path.join(VO, "one.wav"), t_pause + 3.0, 1.0),
+    (os.path.join(SND, "tap.mp3"), t_pause + 1.0, 0.8),
+    (os.path.join(SND, "tap.mp3"), t_pause + 2.0, 0.8),
+    (os.path.join(SND, "tap.mp3"), t_pause + 3.0, 0.8),
+    (os.path.join(SND, "correct.mp3"), t_reveal, 0.8),
+    (os.path.join(VO, "reveal.wav"), t_reveal + 0.35, 1.0),
+    (os.path.join(VO, "outro.wav"), t_outro + 0.3, 1.0),
+]
+total = t_outro + 2.8
+ins = ["-stream_loop", "-1", "-i", os.path.join(SND, "bgm.mp3")]
+# BGM: quiet under the voice, dips during the countdown, fades out at the end
+flt = [f"[1:a]atrim=0:{total:.2f},volume='if(between(t,{t_pause:.2f},{t_reveal:.2f}),0.10,0.22)':eval=frame,"
+       f"afade=t=in:d=0.5,afade=t=out:st={total-1.2:.2f}:d=1.2[bgm]"]
+for i, (f, st, vol) in enumerate(cues):
+    ins += ["-i", f]; ms = int(st * 1000)
+    flt.append(f"[{i+2}:a]volume={vol},adelay={ms}|{ms}[c{i}]")
+flt.append("[bgm]" + "".join(f"[c{i}]" for i in range(len(cues))) + f"amix=inputs={len(cues)+1}:normalize=0,alimiter=limit=0.95,apad[a]")
 run("ffmpeg", "-y", "-i", p("video.mp4"), *ins, "-filter_complex", ";".join(flt), "-map", "0:v", "-map", "[a]",
-    "-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-shortest", p("short.mp4"))
+    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", p("short.mp4"))
 print(p("short.mp4"))
