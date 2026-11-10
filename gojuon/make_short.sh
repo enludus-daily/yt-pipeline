@@ -23,7 +23,7 @@ if ! grep -q "Bot (.*) got it" <<<"$INFO"; then echo "the bot did not win this m
 export ANSWER=$(grep -oP 'Answer: \K[a-z -]+' <<<"$INFO" | sed 's/ *$//')
 N=$(grep -oP '^\d+(?=-letter word)' <<<"$INFO")
 CAT=$(grep -oP 'letter word · \K[^|]+' <<<"$INFO" | sed 's/ *$//')
-export CLUE="${CLUE:-$N letters · $CAT}" CLUES="${CLUES:-a few}" VO=work/vo
+export CLUE="${CLUE:-$N letters · $CAT}" CLUES="${CLUES:-a few}" VO=work/vo ART_INDEX="${ART_INDEX:-$SEED}"
 echo "seed=$SEED answer=$ANSWER clue='$CLUE' G0=$G0 GF=$GF R1=$R1"
 .venv/bin/python common/frames_to_video.py work/frames work/rec.mp4
 common/tts.sh work/vo/hook.wav "This bot guessed the word from just $CLUES clues."

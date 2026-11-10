@@ -57,22 +57,32 @@ for n in "321":
 frame_overlay("ov_result.png", "The bot got it!", None, (ANSWER, "Did you beat it?"))
 HOOK_N = CLUES if CLUES.isdigit() else "a few"
 
-# hook card: blurred board + headline
-bg = Image.open(p("freeze.png")).convert("RGB").resize((W, H)).filter(ImageFilter.GaussianBlur(18))
-bg = Image.blend(bg, Image.new("RGB", (W, H), BG), 0.35); d = ImageDraw.Draw(bg)
+# background art (generated with Codex, assets/gojuon-art/bg-0N.png); ART_INDEX picks one, e.g. seed % 3
+ART_DIR = os.environ.get("ART_DIR", os.path.join(os.path.dirname(__file__), "..", "assets", "gojuon-art"))
+ARTS = sorted(f for f in os.listdir(ART_DIR) if f.endswith(".png")) if os.path.isdir(ART_DIR) else []
+def art(shift=0):
+    if not ARTS:
+        return Image.new("RGB", (W, H), BG)
+    f = ARTS[(int(os.environ.get("ART_INDEX", "0")) + shift) % len(ARTS)]
+    a = Image.open(os.path.join(ART_DIR, f)).convert("RGBA").resize((W, H))
+    base = Image.new("RGBA", (W, H), BG + (255,)); base.alpha_composite(a)
+    return base.convert("RGB")
+
+# hook card: background art + headline
+bg = art(); d = ImageDraw.Draw(bg)
 d.rounded_rectangle((70, 640, W - 70, 1260), radius=56, fill=INK)
 center(d, 700, f"This bot guessed\nthe word from\njust {HOOK_N} clues.", font("Black", 92), (255, 255, 255))
 pill(d, 1120, "Can you do better?", font("Bold", 46), (255, 255, 255), ACCENT)
 bg.save(p("hook.png"))
 
 # outro card
-o = Image.new("RGB", (W, H), BG); d = ImageDraw.Draw(o)
+o = art(1); d = ImageDraw.Draw(o)
 ic = Image.open(ICON).convert("RGBA").resize((360, 360)); m = Image.new("L", (360, 360), 0)
-ImageDraw.Draw(m).rounded_rectangle((0, 0, 360, 360), radius=80, fill=255); o.paste(ic, ((W - 360) // 2, 520), m)
-y = center(d, 940, "Gojuon Minesweeper", font("Black", 84), INK)
+ImageDraw.Draw(m).rounded_rectangle((0, 0, 360, 360), radius=80, fill=255); o.paste(ic, ((W - 360) // 2, 600), m)
+y = center(d, 1010, "Gojuon Minesweeper", font("Black", 84), INK)
 y = center(d, y + 20, "A word-guessing minesweeper\nin English & Japanese", font("SemiBold", 48), (70, 90, 110))
-pill(d, y + 50, "Free on the App Store", font("Bold", 52), (255, 255, 255), BLUE)
-center(d, 1660, "Link in description", font("SemiBold", 40), (110, 130, 150))
+pill(d, y + 40, "Free on the App Store", font("Bold", 52), (255, 255, 255), BLUE)
+center(d, y + 150, "Link in description", font("SemiBold", 40), (90, 110, 130))
 o.save(p("outro.png"))
 
 ENC = ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", "-an"]
