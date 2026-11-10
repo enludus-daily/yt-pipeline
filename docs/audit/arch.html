@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body{margin:0;width:1600px;height:900px;font-family:Inter,Arial,sans-serif;background:#fff;color:#102030}
+h1{font-size:34px;margin:36px 48px 6px} p.sub{margin:0 48px 24px;color:#4a5a6a;font-size:19px}
+.row{display:flex;gap:22px;margin:0 48px;align-items:stretch}
+.box{border:2px solid #2f6f95;border-radius:14px;padding:16px 18px;background:#f3f8fb;flex:1}
+.box h3{margin:0 0 8px;font-size:21px} .box li{font-size:16px;line-height:1.45}
+.arrow{align-self:center;font-size:40px;color:#2f6f95}
+.zone{border:2px dashed #9aa9b6;border-radius:18px;padding:16px;margin:22px 48px 0;position:relative}
+.zone .lbl{position:absolute;top:-14px;left:20px;background:#fff;padding:0 8px;color:#4a5a6a;font-size:16px;font-weight:600}
+.g{background:#fff7ef;border-color:#e07a1e} .note{margin:22px 48px 0;font-size:17px;color:#33424f}
+</style></head><body>
+<h1>Enludus Shorts Publisher — Architecture</h1>
+<p class="sub">Internal command-line tool. One operator (Enludus), one YouTube channel (our own). Source: github.com/enludus-daily/yt-pipeline</p>
+<div class="zone"><span class="lbl">Operator's computer (Enludus) — nothing is hosted for other users</span>
+<div class="row">
+ <div class="box"><h3>1. Make the video</h3><ul><li>Record real gameplay of our own app (headless browser)</li><li>Narration from our own script (local TTS)</li><li>Our own synthesized music/SFX</li><li>Compose 1080×1920 MP4 (ffmpeg)</li></ul></div>
+ <div class="arrow">→</div>
+ <div class="box"><h3>2. Metadata (JSON)</h3><ul><li>Title, description, tags</li><li>Category, privacy, madeForKids</li><li>containsSyntheticMedia</li><li>Written by us per video</li></ul></div>
+ <div class="arrow">→</div>
+ <div class="box"><h3>3. common/upload.py</h3><ul><li>OAuth 2.0 installed-app flow</li><li>Scope: youtube.upload only</li><li>Token stored locally in .cache/ (git-ignored)</li><li>Resumable upload; logs video ID</li></ul></div>
+</div></div>
+<div class="row" style="margin-top:22px">
+ <div class="box g"><h3>Google OAuth 2.0</h3><ul><li>Channel owner signs in once and consents</li><li>Access revocable at myaccount.google.com/permissions</li></ul></div>
+ <div class="arrow">↔</div>
+ <div class="box g"><h3>YouTube Data API v3</h3><ul><li>videos.insert (part=snippet,status)</li><li>No reads of other channels, viewers, comments or analytics</li></ul></div>
+ <div class="arrow">→</div>
+ <div class="box g"><h3>Our YouTube channel</h3><ul><li>Short published (or scheduled)</li><li>Operator checks it in YouTube Studio</li></ul></div>
+</div>
+<p class="note">Data stored: OAuth token + upload log (video ID, title, privacy) on the operator's computer only. No data is shared with third parties. Privacy: enludus.com/products/shorts-publisher-privacy · Terms: enludus.com/products/shorts-publisher-terms</p>
+</body></html>

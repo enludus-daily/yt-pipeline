@@ -1,0 +1,159 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body{font-family:Inter,Arial,sans-serif;margin:28px;color:#102030} h1{font-size:20px;margin:0 0 4px} p{font-size:12px;margin:2px 0;color:#33424f}
+pre{font-family:'DejaVu Sans Mono',monospace;font-size:9.5px;line-height:1.35;background:#f5f8fa;border:1px solid #d6e0e8;padding:12px;white-space:pre-wrap;word-break:break-all}
+</style></head><body>
+<h1>Enludus Shorts Publisher — complete upload script (common/upload.py)</h1>
+<p>Full, working source as used in production. Public repository: https://github.com/enludus-daily/yt-pipeline/blob/main/common/upload.py</p>
+<p>Scope: https://www.googleapis.com/auth/youtube.upload only. Endpoint: videos.insert (part=snippet,status). Token stored locally in .cache/ (git-ignored).</p>
+<pre>&quot;&quot;&quot;Upload one video to our own YouTube channel (YouTube Data API v3, videos.insert).
+
+usage:
+  python common/upload.py &lt;video.mp4&gt; &lt;meta.json&gt; [--dry-run]
+  python common/upload.py --auth [--no-browser]      # sign in once and save the token
+
+meta.json (see examples/gojuon-14-ketchup.json):
+  title, description, tags[], categoryId (&quot;20&quot; = Gaming), privacyStatus (private/unlisted/public),
+  publishAt (optional, RFC3339; needs privacyStatus &quot;private&quot;), madeForKids (bool),
+  containsSyntheticMedia (bool: realistic altered/synthetic content), defaultLanguage, defaultAudioLanguage
+
+Until the API project passes YouTube&#x27;s audit, every upload is locked to private by YouTube,
+whatever privacyStatus says. Upload by hand in YouTube Studio until then.
+
+Files (never commit them; .cache/ is git-ignored):
+  .cache/client_secret.json   OAuth client (Desktop app) downloaded from Google Cloud Console
+  .cache/youtube-token.json   saved token (refreshed automatically)
+&quot;&quot;&quot;
+import argparse
+import json
+import os
+import sys
+import time
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CLIENT = os.environ.get(&quot;YT_CLIENT_SECRET&quot;, os.path.join(ROOT, &quot;.cache&quot;, &quot;client_secret.json&quot;))
+TOKEN = os.environ.get(&quot;YT_TOKEN&quot;, os.path.join(ROOT, &quot;.cache&quot;, &quot;youtube-token.json&quot;))
+LOG = os.path.join(ROOT, &quot;output&quot;, &quot;uploads.jsonl&quot;)
+SCOPES = [&quot;https://www.googleapis.com/auth/youtube.upload&quot;]
+
+
+def credentials(no_browser=False, force=False):
+    from google.auth.transport.requests import Request
+    from google.oauth2.credentials import Credentials
+    from google_auth_oauthlib.flow import InstalledAppFlow
+
+    creds = None
+    if os.path.exists(TOKEN) and not force:
+        creds = Credentials.from_authorized_user_file(TOKEN, SCOPES)
+    if creds and creds.valid:
+        return creds
+    if creds and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+    else:
+        if not os.path.exists(CLIENT):
+            sys.exit(f&quot;OAuth client not found: {CLIENT} (download it from Google Cloud Console &gt; Credentials)&quot;)
+        flow = InstalledAppFlow.from_client_secrets_file(CLIENT, SCOPES)
+        if no_browser:
+            # For a machine without a browser: open the URL elsewhere, then paste the
+            # address the browser lands on (http://localhost:8080/?code=...), even if the page fails to load.
+            os.environ.setdefault(&quot;OAUTHLIB_INSECURE_TRANSPORT&quot;, &quot;1&quot;)
+            flow.redirect_uri = &quot;http://localhost:8080/&quot;
+            url, _ = flow.authorization_url(access_type=&quot;offline&quot;, prompt=&quot;consent&quot;)
+            print(&quot;Open this URL, sign in with the channel&#x27;s Google account, then paste the final address:\n&quot; + url)
+            flow.fetch_token(authorization_response=input(&quot;&gt; &quot;).strip())
+            creds = flow.credentials
+        else:
+            creds = flow.run_local_server(port=0, access_type=&quot;offline&quot;, prompt=&quot;consent&quot;)
+    os.makedirs(os.path.dirname(TOKEN), exist_ok=True)
+    with open(TOKEN, &quot;w&quot;) as f:
+        f.write(creds.to_json())
+    return creds
+
+
+def body_from(meta):
+    for key in (&quot;title&quot;, &quot;description&quot;):
+        if not meta.get(key):
+            sys.exit(f&quot;meta.json: &#x27;{key}&#x27; is required&quot;)
+    if len(meta[&quot;title&quot;]) &gt; 100:
+        sys.exit(f&quot;meta.json: title is {len(meta[&#x27;title&#x27;])} characters (max 100)&quot;)
+    if len(meta[&quot;description&quot;].encode(&quot;utf-8&quot;)) &gt; 5000:
+        sys.exit(&quot;meta.json: description is over 5000 bytes&quot;)
+    if any(c in meta[&quot;title&quot;] + meta[&quot;description&quot;] for c in &quot;&lt;&gt;&quot;):
+        sys.exit(&quot;meta.json: &#x27;&lt;&#x27; and &#x27;&gt;&#x27; are not allowed in title or description&quot;)
+    tags = meta.get(&quot;tags&quot;, [])
+    if sum(len(t) + 2 for t in tags) &gt; 500:
+        sys.exit(&quot;meta.json: tags are over 500 characters in total&quot;)
+    status = {
+        &quot;privacyStatus&quot;: meta.get(&quot;privacyStatus&quot;, &quot;private&quot;),
+        &quot;selfDeclaredMadeForKids&quot;: bool(meta.get(&quot;madeForKids&quot;, False)),
+        &quot;containsSyntheticMedia&quot;: bool(meta.get(&quot;containsSyntheticMedia&quot;, False)),
+    }
+    if meta.get(&quot;publishAt&quot;):
+        if status[&quot;privacyStatus&quot;] != &quot;private&quot;:
+            sys.exit(&quot;meta.json: publishAt needs privacyStatus &#x27;private&#x27;&quot;)
+        status[&quot;publishAt&quot;] = meta[&quot;publishAt&quot;]
+    snippet = {
+        &quot;title&quot;: meta[&quot;title&quot;],
+        &quot;description&quot;: meta[&quot;description&quot;],
+        &quot;tags&quot;: tags,
+        &quot;categoryId&quot;: str(meta.get(&quot;categoryId&quot;, &quot;20&quot;)),
+        &quot;defaultLanguage&quot;: meta.get(&quot;defaultLanguage&quot;, &quot;en&quot;),
+        &quot;defaultAudioLanguage&quot;: meta.get(&quot;defaultAudioLanguage&quot;, &quot;en&quot;),
+    }
+    return {&quot;snippet&quot;: snippet, &quot;status&quot;: status}
+
+
+def upload(video, meta_path, dry_run=False):
+    with open(meta_path, encoding=&quot;utf-8&quot;) as f:
+        meta = json.load(f)
+    body = body_from(meta)
+    if not os.path.exists(video):
+        sys.exit(f&quot;video not found: {video}&quot;)
+    if dry_run:
+        print(json.dumps(body, ensure_ascii=False, indent=2))
+        print(f&quot;OK (dry run): {video}&quot;)
+        return
+    from googleapiclient.discovery import build
+    from googleapiclient.errors import HttpError
+    from googleapiclient.http import MediaFileUpload
+
+    yt = build(&quot;youtube&quot;, &quot;v3&quot;, credentials=credentials())
+    media = MediaFileUpload(video, mimetype=&quot;video/mp4&quot;, chunksize=8 * 1024 * 1024, resumable=True)
+    req = yt.videos().insert(part=&quot;snippet,status&quot;, body=body, media_body=media, notifySubscribers=True)
+    response, tries = None, 0
+    while response is None:
+        try:
+            progress, response = req.next_chunk()
+            if progress:
+                print(f&quot;uploading {int(progress.progress() * 100)}%&quot;)
+        except HttpError as e:
+            if e.resp.status in (500, 502, 503, 504) and tries &lt; 5:
+                tries += 1
+                time.sleep(2 ** tries)
+                continue
+            raise
+    vid = response[&quot;id&quot;]
+    st = response.get(&quot;status&quot;, {})
+    print(f&quot;uploaded: https://youtu.be/{vid}  privacy={st.get(&#x27;privacyStatus&#x27;)}  upload={st.get(&#x27;uploadStatus&#x27;)}&quot;)
+    os.makedirs(os.path.dirname(LOG), exist_ok=True)
+    with open(LOG, &quot;a&quot;, encoding=&quot;utf-8&quot;) as f:
+        f.write(json.dumps({&quot;time&quot;: time.strftime(&quot;%Y-%m-%dT%H:%M:%S%z&quot;), &quot;video&quot;: os.path.basename(video),
+                            &quot;id&quot;: vid, &quot;title&quot;: meta[&quot;title&quot;], &quot;privacy&quot;: st.get(&quot;privacyStatus&quot;)},
+                           ensure_ascii=False) + &quot;\n&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    ap = argparse.ArgumentParser()
+    ap.add_argument(&quot;video&quot;, nargs=&quot;?&quot;)
+    ap.add_argument(&quot;meta&quot;, nargs=&quot;?&quot;)
+    ap.add_argument(&quot;--dry-run&quot;, action=&quot;store_true&quot;)
+    ap.add_argument(&quot;--auth&quot;, action=&quot;store_true&quot;, help=&quot;sign in and save the token, then exit&quot;)
+    ap.add_argument(&quot;--no-browser&quot;, action=&quot;store_true&quot;)
+    a = ap.parse_args()
+    if a.auth:
+        credentials(no_browser=a.no_browser, force=True)
+        print(f&quot;saved token: {TOKEN}&quot;)
+    elif a.video and a.meta:
+        upload(a.video, a.meta, a.dry_run)
+    else:
+        ap.print_help()
+</pre></body></html>
