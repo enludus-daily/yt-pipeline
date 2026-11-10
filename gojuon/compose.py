@@ -55,12 +55,13 @@ frame_overlay("ov_pause.png", "Pause & guess!", CLUE)
 for n in "321":
     frame_overlay(f"ov_pause{n}.png", f"Pause & guess!  {n}", CLUE)
 frame_overlay("ov_result.png", "The bot got it!", None, (ANSWER, "Did you beat it?"))
+HOOK_N = CLUES if CLUES.isdigit() else "a few"
 
 # hook card: blurred board + headline
 bg = Image.open(p("freeze.png")).convert("RGB").resize((W, H)).filter(ImageFilter.GaussianBlur(18))
 bg = Image.blend(bg, Image.new("RGB", (W, H), BG), 0.35); d = ImageDraw.Draw(bg)
 d.rounded_rectangle((70, 640, W - 70, 1260), radius=56, fill=INK)
-center(d, 700, f"This bot guessed\nthe word from\njust {CLUES} clues.", font("Black", 92), (255, 255, 255))
+center(d, 700, f"This bot guessed\nthe word from\njust {HOOK_N} clues.", font("Black", 92), (255, 255, 255))
 pill(d, 1120, "Can you do better?", font("Bold", 46), (255, 255, 255), ACCENT)
 bg.save(p("hook.png"))
 

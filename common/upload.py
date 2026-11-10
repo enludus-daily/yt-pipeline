@@ -4,7 +4,7 @@ usage:
   python common/upload.py <video.mp4> <meta.json> [--dry-run]
   python common/upload.py --auth [--no-browser]      # sign in once and save the token
 
-meta.json (see examples/gojuon-ketchup-short.json):
+meta.json (see examples/gojuon-14-ketchup.json):
   title, description, tags[], categoryId ("20" = Gaming), privacyStatus (private/unlisted/public),
   publishAt (optional, RFC3339; needs privacyStatus "private"), madeForKids (bool),
   containsSyntheticMedia (bool: realistic altered/synthetic content), defaultLanguage, defaultAudioLanguage

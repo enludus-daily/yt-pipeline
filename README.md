@@ -53,19 +53,20 @@ Playwright と Chromium が要る（クラウドのセッションには入っ�
 2. 録って合成する：
 
    ```bash
-   CLUE="7 letters · a condiment" CLUES=3 GAME_LINE="Seven letters. A condiment. Can you beat it?" \
-     gojuon/make_short.sh 14 KETCHUP 3.5 10.7 13.4
+   gojuon/make_short.sh 14            # → output/gojuon-14-ketchup.mp4
+   CLUES=3 gojuon/make_short.sh 14    # つかみを "from just 3 clues" にする（開いていたマスの数が分かるとき）
    ```
 
-   - `G0`（3.5）：盤面が出た時刻。`record.js` の `MARK board` の少しあと
-   - `GF`（10.7）：ボットが最後に考えている場面（答えが出る直前）。止めてカウントダウンを出す
-   - `R1`（13.4）：結果の画面の終わり
-   - 時刻は `MARK` の行を見て決め、`work/out/` のコマ（`ffmpeg -ss <秒> -i work/rec.mp4 -frames:v 1 x.png`）で確かめる
+   - 答え・文字数・ジャンル（例：`7 letters · Condiments`）は対戦の結果から読む。ボットが勝たなかった seed は止まる
+   - 時刻は録画中に自動で決める：`G0` = 盤面が出た時刻 + 0.2、`GF`（一時停止）= 決着の 0.45 秒前（ボットが最後に考えている場面）、`R1` = 決着 + 2.3
+   - 決着の時刻は、ページの中の MutationObserver が「got it!」が出た瞬間を記録する（`MARK over_exact`）
+   - 必ず `work/out/freeze.png` を開き、**答えが映っていない**ことを確かめる
+   - 時刻を手で決めるとき：`gojuon/make_short.sh 14 3.5 10.4 13.2`
 
 3. `output/` の mp4 と、`examples/*.json` に倣ったメタデータで投稿する：
 
    ```bash
-   .venv/bin/python common/upload.py output/gojuon-14-ketchup.mp4 examples/gojuon-ketchup-short.json
+   .venv/bin/python common/upload.py output/gojuon-14-ketchup.mp4 examples/gojuon-14-ketchup.json
    ```
 
 ## 投稿
