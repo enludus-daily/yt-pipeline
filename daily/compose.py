@@ -80,7 +80,11 @@ ENC = ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", "-an"]
 def still(img, secs, out):
     run("ffmpeg", "-y", "-i", img, "-frames:v", str(int(secs * 30)), "-vf",
         f"scale={W}:{H},zoompan=z='min(zoom+0.0006,1.04)':d={int(secs * 30)}:s={W}x{H}:fps=30", *ENC, out)
-HOOK_S, OUTRO_S = 3.0, 3.0
+def vo_len(name):
+    f = os.path.join(VO, f"{name}.wav") if VO else ""
+    return dur(f) if f and os.path.exists(f) else 0.0
+# each card lasts at least 3 s, longer when its narration needs it
+HOOK_S, OUTRO_S = max(3.0, vo_len("hook") + 0.7), max(3.0, vo_len("outro") + 0.9)
 still(p("hook.png"), HOOK_S, p("s1.mp4"))
 # the phone recording keeps its aspect ratio, fitted into DW x (H - DY - 60), with a soft shadow frame
 run("ffmpeg", "-y", "-loop", "1", "-i", p("ov_demo.png"), "-i", DEMO, "-filter_complex",

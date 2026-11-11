@@ -88,6 +88,8 @@ DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion."
 
 ## 投稿
 
-- YouTube Data API の審査（audit）が通るまで、API で上げた動画は非公開に固定され、公開に切り替えられない。それまでは **YouTube Studio から手で上げる**。手順と申請の下書きは `docs/youtube-api-audit.md`。
+- YouTube Data API の審査（audit）は 2026-11-10 に申請済み。審査前の API のアップロードは非公開になる。
+- 2026-11-11 の実測：審査前に API で上げた動画（非公開）を、YouTube Studio から**手で公開に切り替えられた**。ネットの情報（「切り替えられない」）とは違ったので、当面は「API で非公開で上げる → Studio で確かめて手で公開」で回す。YouTube の扱いが変わる可能性はあるので、切り替えられなくなったら Studio から手で上げる。
+- 手順と申請の下書きは `docs/youtube-api-audit.md`。
 - 合成音声は自分の台本を読んでいるだけで、実在の人物を模したものではない。実際のゲーム画面なので「改変または合成されたコンテンツ」の申告は不要（現実と見分けがつかない人物・出来事を作った場合だけ必要）。
 - 同じ型の量産は YouTube の inauthentic content に当たりやすい。お題・つかみの文・見せ方を毎回変える。
