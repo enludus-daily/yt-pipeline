@@ -89,7 +89,7 @@ DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion."
 ## 見た目のきまり（2026-11-11 本人の指摘：「五十音マインスイーパーに引っ張られすぎ」）
 
 - 動画の背景・色・音楽は、**そのアプリ自身のもの**から作る。ほかのアプリの絵（`assets/gojuon-art/`）や BGM（`assets/gojuon-sounds/`）は、五十音マインスイーパーの動画だけに使う
-- 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はアプリごとに `common/bgm.py` で一から合成する（`python common/bgm.py <preset> apps/<app>/bgm.m4a`。プリセットはアプリの雰囲気ごと：tamahebi・umeda・calm・arcade。新しいアプリには、使い回さずにプリセットを足す）。アプリに自前の BGM があればそれを使う（StudyReel・五十音マインスイーパー）
+- 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はアプリごとに `common/bgm.py` で一から合成する。**毎回ちがう曲にする**（2026-11-11 本人：「似てるから、毎回ちゃんと作って」）：`python common/bgm.py new <app>` で、直近 5 本のアプリが使っていないジャンル（lofi・chiptune・bossa・synthwave・folk・ambient・funk・waltz）を選び、アプリ名から決まる種でテンポ・調・音階・コード進行・メロディを変える。曲は イントロ → A → B（メロディが上がる）→ A → B。`apps/<app>/bgm.m4a` と `bgm.json`（ジャンル・テンポ・調）を書く。アプリの雰囲気に合うジャンルを `--genre` で選んでよい。作った BGM はそのアプリのリポジトリの `docs/promo/bgm.m4a` にも置く。アプリに自前の BGM があればそれを使う（StudyReel・五十音マインスイーパー）
 - チャンネルのバナーとアイコンは Enludus のロゴの色（紺・水色・オレンジ）
 
 ## 投稿
