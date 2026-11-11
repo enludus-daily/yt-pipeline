@@ -1,20 +1,61 @@
 {
   "recording": "rec.mp4",
   "icon": "icon.png",
-  "art": "../../assets/gojuon-art/bg-02.png",
-  "bgm": "../../assets/gojuon-sounds/bgm.mp3",
-  "hook": { "text": "Lost in Umeda's underground maze?", "sub": "Osaka, Japan", "secs": 3.0 },
+  "hook": {
+    "text": "Lost in Umeda's underground maze?",
+    "sub": "Osaka, Japan",
+    "secs": 3.0
+  },
   "segments": [
-    { "from": 4.6, "to": 11.2, "caption": "Search any shop, exit, or spot" },
-    { "from": 11.2, "to": 15.6, "caption": "No GPS underground? Type the exit number you see" },
-    { "from": 15.6, "to": 24.9, "caption": "Then follow it, step by step" }
+    {
+      "from": 4.6,
+      "to": 11.2,
+      "caption": "Search any shop, exit, or spot"
+    },
+    {
+      "from": 11.2,
+      "to": 15.6,
+      "caption": "No GPS underground? Type the exit number you see"
+    },
+    {
+      "from": 15.6,
+      "to": 24.9,
+      "caption": "Then follow it, step by step"
+    }
   ],
-  "outro": { "name": "Umeda Underground Navi", "lines": ["Free web app · 10 languages", "No download needed"], "pill": "umeda.enludus.com", "secs": 3.2 },
-  "voice": { "name": "af_bella", "speed": 1.06, "lines": [
-    { "at": "hook", "text": "Lost in Umeda's underground maze? Everyone is!" },
-    { "at": 0, "text": "Search for any shop, exit, or spot." },
-    { "at": 1, "text": "GPS doesn't work down here, so just type the exit number you see." },
-    { "at": 2, "text": "Then it walks you there, one step at a time!" },
-    { "at": "outro", "text": "Umeda Underground Navi. Free, in ten languages!" }
-  ] }
+  "outro": {
+    "name": "Umeda Underground Navi",
+    "lines": [
+      "Free web app · 10 languages",
+      "No download needed"
+    ],
+    "pill": "umeda.enludus.com",
+    "secs": 3.2
+  },
+  "voice": {
+    "name": "af_bella",
+    "speed": 1.06,
+    "lines": [
+      {
+        "at": "hook",
+        "text": "Lost in Umeda's underground maze? Everyone is!"
+      },
+      {
+        "at": 0,
+        "text": "Search for any shop, exit, or spot."
+      },
+      {
+        "at": 1,
+        "text": "GPS doesn't work down here, so just type the exit number you see."
+      },
+      {
+        "at": 2,
+        "text": "Then it walks you there, one step at a time!"
+      },
+      {
+        "at": "outro",
+        "text": "Umeda Underground Navi. Free, in ten languages!"
+      }
+    ]
+  }
 }

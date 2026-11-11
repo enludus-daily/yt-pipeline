@@ -14,12 +14,15 @@ spec (paths are relative to the spec file):
   "voice": {"name": "af_bella", "speed": 1.06,
             "lines": [{"at": "hook", "text": "..."}, {"at": 0, "text": "..."}, {"at": "outro", "text": "..."}]},
                                      # at: "hook" / "outro" / segment index. Needs Kokoro (.cache/kokoro, common/kokoro_say.py)
-  "bgm": "../assets/gojuon-sounds/bgm.mp3",   # optional, ducked under the voice
-  "art": "../assets/gojuon-art/bg-01.png"     # optional background for hook/outro cards
+  "bgm": "music.m4a",       # optional: the app's OWN music only (ducked under the voice). No other app's music
+  "art": "bg.png",          # optional: the app's OWN art. Default: a blurred frame of the recording
+  "accent": [r, g, b]       # optional. Default: the most vivid colour of the icon
 }
 """
 import json, os, subprocess, sys
 from PIL import Image, ImageDraw, ImageFont
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from look import frame_bg, accent, ink_on
 
 SPEC, OUT = sys.argv[1], sys.argv[2]
 spec = json.load(open(SPEC)); base = os.path.dirname(os.path.abspath(SPEC))
@@ -46,11 +49,13 @@ def pill(d, y, text, f, fg, bg):
     tw = d.textlength(text, font=f); pad = 34; h = f.size + 40
     d.rounded_rectangle(((W - tw) / 2 - pad, y, (W + tw) / 2 + pad, y + h), radius=h // 2, fill=bg)
     d.text(((W - tw) / 2, y + 16), text, font=f, fill=fg); return y + h
-def card_bg():
-    im = Image.new("RGBA", (W, H), BG + (255,))
+ACC = tuple(spec["accent"]) if spec.get("accent") else accent(rel(spec["icon"])) if spec.get("icon") else BLUE
+def card_bg(at=None):
+    # the app's own footage, blurred — never another app's art. "art" only when this app has its own
     if spec.get("art") and os.path.exists(rel(spec["art"])):
-        im.alpha_composite(Image.open(rel(spec["art"])).convert("RGBA").resize((W, H)))
-    return im.convert("RGB")
+        im = Image.new("RGBA", (W, H), BG + (255,)); im.alpha_composite(Image.open(rel(spec["art"])).convert("RGBA").resize((W, H)))
+        return im.convert("RGB")
+    return frame_bg(rel(spec["recording"]), at)
 
 # voice first: card lengths follow the narration
 voice = spec.get("voice"); vo = {}
@@ -70,16 +75,16 @@ OUTRO_S = max(outro.get("secs", 3.2), vo_len("outro") + 0.9)
 im = card_bg(); d = ImageDraw.Draw(im)
 d.rounded_rectangle((70, 660, W - 70, 1260), radius=56, fill=INK)
 y = center(d, 720, hook["text"], font("Black", 84), (255, 255, 255), W - 220)
-if hook.get("sub"): pill(d, max(y + 30, 1110), hook["sub"], font("Bold", 44), (255, 255, 255), ACCENT)
+if hook.get("sub"): pill(d, max(y + 30, 1110), hook["sub"], font("Bold", 44), ink_on(ACC), ACC)
 im.save(p("hook.png"))
 
-o = card_bg(); d = ImageDraw.Draw(o); y = 600
+o = card_bg(spec["segments"][-1]["to"] - 1.0); d = ImageDraw.Draw(o); y = 600
 if spec.get("icon") and os.path.exists(rel(spec["icon"])):
     ic = Image.open(rel(spec["icon"])).convert("RGBA").resize((320, 320)); m = Image.new("L", (320, 320), 0)
     ImageDraw.Draw(m).rounded_rectangle((0, 0, 320, 320), radius=70, fill=255); o.paste(ic, ((W - 320) // 2, 560), m); y = 940
 y = center(d, y, outro["name"], font("Black", 78), INK)
 for line in outro.get("lines", []): y = center(d, y + 10, line, font("SemiBold", 46), (70, 90, 110))
-if outro.get("pill"): pill(d, y + 40, outro["pill"], font("Bold", 50), (255, 255, 255), BLUE)
+if outro.get("pill"): pill(d, y + 40, outro["pill"], font("Bold", 50), ink_on(ACC), ACC)
 o.save(p("outro.png"))
 
 ENC = ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", "-an"]
@@ -91,7 +96,7 @@ SC = 0.82; GW, GH = int(W * SC), int(H * SC); GX, GY = (W - GW) // 2, H - GH - 4
 parts = ["hook"]; still(p("hook.png"), HOOK_S, p("hook.mp4"))
 seg_start = []; t = HOOK_S
 for i, s in enumerate(spec["segments"]):
-    ov = Image.new("RGBA", (W, H), BG + (255,)); d = ImageDraw.Draw(ov)
+    ov = card_bg((s["from"] + s["to"]) / 2).convert("RGBA"); d = ImageDraw.Draw(ov)
     ov.paste((0, 0, 0, 0), (GX, GY, GX + GW, GY + GH))
     center(d, 70, s["caption"], font("Black", 62), INK, W - 120)
     ov.save(p(f"ov{i}.png"))

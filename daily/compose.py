@@ -8,20 +8,22 @@ env (all text is English, written per app):
   TAGLINE   one short line under the name at the end, e.g. "A physics puzzle for iPhone"
   STORE     "Coming soon to the App Store" (default) or "Free on the App Store"
   VO        directory with hook.wav / demo.wav / outro.wav (narration; optional)
-  ART_DIR   background art (default assets/gojuon-art; per-day art from Codex can replace it)
-  SOUNDS    BGM directory with bgm.mp3 (optional; default assets/gojuon-sounds)
+  ART_DIR   this app's OWN background art (default: a blurred frame of its demo — never another app's art)
+  SOUNDS    this app's OWN music directory with bgm.mp3 (optional; default: narration only)
 The demo is the app's own `-demo` playback recorded in CI (daily-actions ios-ci, artifact demo-video).
 """
 import os, subprocess, sys
 from PIL import Image, ImageDraw, ImageFont
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'common'))
+from look import frame_bg, accent, ink_on
 
 DEMO, ICON, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
 DAY = os.environ.get("DAY", "1"); NAME = os.environ.get("NAME", "Today's app")
 HOOK = os.environ.get("HOOK", "An AI built this iPhone app in one day.")
 TAGLINE = os.environ.get("TAGLINE", ""); STORE = os.environ.get("STORE", "Coming soon to the App Store")
 VO = os.environ.get("VO", ""); ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-ART_DIR = os.environ.get("ART_DIR", os.path.join(ROOT, "assets", "gojuon-art"))
-SND = os.environ.get("SOUNDS", os.path.join(ROOT, "assets", "gojuon-sounds"))
+ART_DIR = os.environ.get("ART_DIR", "")  # only this app's own art; default is a blurred frame of its demo
+SND = os.environ.get("SOUNDS", "")  # only this app's own music (bgm.mp3); default: narration only
 W, H = 1080, 1920; BG = (234, 242, 247); INK = (16, 32, 48); ACCENT = (232, 122, 30); BLUE = (52, 138, 180)
 F = "/usr/share/fonts/opentype/inter/Inter-{}.otf"
 font = lambda w, s: ImageFont.truetype(F.format(w), s)
@@ -44,18 +46,21 @@ def pill(d, y, text, f, fg, bg):
     tw = d.textlength(text, font=f); pad = 34; h = f.size + 40
     d.rounded_rectangle(((W - tw) / 2 - pad, y, (W + tw) / 2 + pad, y + h), radius=h // 2, fill=bg)
     d.text(((W - tw) / 2, y + 16), text, font=f, fill=fg); return y + h
+ACC = accent(ICON)
 def art(i):
-    arts = sorted(f for f in os.listdir(ART_DIR) if f.endswith(".png")) if os.path.isdir(ART_DIR) else []
-    base = Image.new("RGBA", (W, H), BG + (255,))
-    if arts: base.alpha_composite(Image.open(os.path.join(ART_DIR, arts[(int(DAY) + i) % len(arts)])).convert("RGBA").resize((W, H)))
-    return base.convert("RGB")
+    arts = sorted(f for f in os.listdir(ART_DIR) if f.endswith(".png")) if ART_DIR and os.path.isdir(ART_DIR) else []
+    if arts:
+        base = Image.new("RGBA", (W, H), BG + (255,))
+        base.alpha_composite(Image.open(os.path.join(ART_DIR, arts[(int(DAY) + i) % len(arts)])).convert("RGBA").resize((W, H)))
+        return base.convert("RGB")
+    d = dur(DEMO); return frame_bg(DEMO, d * (0.3 if i == 0 else 0.85))
 def icon(size):
     ic = Image.open(ICON).convert("RGBA").resize((size, size)); m = Image.new("L", (size, size), 0)
     ImageDraw.Draw(m).rounded_rectangle((0, 0, size, size), radius=int(size * 0.22), fill=255); return ic, m
 
 # 1) hook card
 im = art(0); d = ImageDraw.Draw(im)
-pill(d, 560, f"DAY {DAY}", font("Black", 56), (255, 255, 255), ACCENT)
+pill(d, 560, f"DAY {DAY}", font("Black", 56), ink_on(ACC), ACC)
 d.rounded_rectangle((70, 700, W - 70, 1240), radius=56, fill=INK)
 y = center(d, 760, HOOK, font("Black", 78), (255, 255, 255), W - 220)
 center(d, max(y + 30, 1120), "An AI built it in one day.", font("SemiBold", 44), (255, 196, 140))
@@ -63,16 +68,16 @@ im.save(p("hook.png"))
 
 # 2) demo overlay: caption band on top, phone recording below
 dd = dur(DEMO); DW = 820; DY = 300
-ov = Image.new("RGBA", (W, H), BG + (255,)); d = ImageDraw.Draw(ov)
+ov = art(0).convert("RGBA"); d = ImageDraw.Draw(ov)
 center(d, 70, f"Day {DAY}: {NAME}", font("Black", 64), INK)
-pill(d, 175, "Built by AI in ~1 day", font("Bold", 40), (255, 255, 255), ACCENT)
+pill(d, 175, "Built by AI in ~1 day", font("Bold", 40), ink_on(ACC), ACC)
 ov.save(p("ov_demo.png"))
 
 # 3) outro card
 o = art(1); d = ImageDraw.Draw(o); ic, m = icon(340); o.paste(ic, ((W - 340) // 2, 560), m)
 y = center(d, 950, NAME, font("Black", 84), INK)
 if TAGLINE: y = center(d, y + 10, TAGLINE, font("SemiBold", 46), (70, 90, 110))
-y = pill(d, y + 40, STORE, font("Bold", 48), (255, 255, 255), BLUE)
+y = pill(d, y + 40, STORE, font("Bold", 48), ink_on(ACC), ACC)
 center(d, y + 30, f"Day {int(DAY) + 1} drops tomorrow. Follow along!", font("SemiBold", 40), (90, 110, 130))
 o.save(p("outro.png"))
 
@@ -96,7 +101,7 @@ run("ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", p("list.txt"), "-c", "co
 
 total = HOOK_S + dd + OUTRO_S
 ins = []; flt = []; n = 0
-if os.path.exists(os.path.join(SND, "bgm.mp3")):
+if SND and os.path.exists(os.path.join(SND, "bgm.mp3")):
     ins += ["-stream_loop", "-1", "-i", os.path.join(SND, "bgm.mp3")]; n += 1
     flt.append(f"[1:a]atrim=0:{total:.2f},volume=0.20,afade=t=in:d=0.5,afade=t=out:st={total - 1.2:.2f}:d=1.2[m0]")
 for name, st in (("hook", 0.3), ("demo", HOOK_S + 0.4), ("outro", HOOK_S + dd + 0.3)):

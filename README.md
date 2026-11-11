@@ -86,6 +86,12 @@ DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion."
 
 構成：つかみ（DAY N と、困りごと／組み合わせの 1 行）3 秒 → デモ（上に「Day N: 名前」「Built by AI in ~1 day」）→ アプリの紹介（アイコン・名前・ストア・「Day N+1 は明日」）3 秒。HOOK・TAGLINE はアプリごとに README と daily-ideas の Issue から英語で書く（同じ文の使い回しをしない）。
 
+## 見た目のきまり（2026-11-11 本人の指摘：「五十音マインスイーパーに引っ張られすぎ」）
+
+- 動画の背景・色・音楽は、**そのアプリ自身のもの**から作る。ほかのアプリの絵（`assets/gojuon-art/`）や BGM（`assets/gojuon-sounds/`）は、五十音マインスイーパーの動画だけに使う
+- 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はなし（ナレーションだけ）。アプリに自前の BGM があればそれを使う
+- チャンネルのバナーとアイコンは Enludus のロゴの色（紺・水色・オレンジ）
+
 ## 投稿
 
 - YouTube Data API の審査（audit）は 2026-11-10 に申請済み。審査前の API のアップロードは非公開になる。
