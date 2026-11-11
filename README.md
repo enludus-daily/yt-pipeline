@@ -92,6 +92,13 @@ DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion."
 - 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はアプリごとに `common/bgm.py` で一から合成する。**毎回ちがう曲にする**（2026-11-11 本人：「似てるから、毎回ちゃんと作って」）：`python common/bgm.py new <app>` で、直近 5 本のアプリが使っていないジャンル（lofi・chiptune・bossa・synthwave・folk・ambient・funk・waltz）を選び、アプリ名から決まる種でテンポ・調・音階・コード進行・メロディを変える。曲は イントロ → A → B（メロディが上がる）→ A → B。`apps/<app>/bgm.m4a` と `bgm.json`（ジャンル・テンポ・調）を書く。アプリの雰囲気に合うジャンルを `--genre` で選んでよい。作った BGM はそのアプリのリポジトリの `docs/promo/bgm.m4a` にも置く。アプリに自前の BGM があればそれを使う（StudyReel・五十音マインスイーパー）
 - チャンネルのバナーとアイコンは Enludus のロゴの色（紺・水色・オレンジ）
 
+## 公開の時刻（2026-11-11 本人：「アメリカの日中に、夜中じゃなく」）
+
+- `python publish/schedule.py` で、待ち行列の動画に公開日時を入れてから `publish/upload_queue.py` で上げる（YouTube が時刻に自分で公開する）
+- 枠（米国東部時間。夏時間は自動）：**12:00 ET** は「AI ships an app a day」（`day<N>-*`）、**16:00 ET** はそれ以外。1 日 1 枠 1 本
+- 冬時間では 12:00 ET = 9:00 PT = 日本時間の翌 2:00、16:00 ET = 13:00 PT = 翌 6:00
+- 使った枠は `publish/scheduled.json`（Studio で手で予約したものも書いておく）
+
 ## 投稿
 
 - 2026-11-11 に YouTube から返事：**API で上げた動画が自動で非公開になることはない**（ネットの「審査まで非公開に固定」は古い情報）。審査の申請は「割り当てを増やす必要がないので」閉じられた。→ `privacyStatus: public` でそのまま公開、または `private` + `publishAt` で予約できる。
