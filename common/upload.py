@@ -9,8 +9,9 @@ meta.json (see examples/gojuon-14-ketchup.json):
   publishAt (optional, RFC3339; needs privacyStatus "private"), madeForKids (bool),
   containsSyntheticMedia (bool: realistic altered/synthetic content), defaultLanguage, defaultAudioLanguage
 
-Until the API project passes YouTube's audit, uploads come in as private whatever privacyStatus says.
-As of 2026-11-11 they could still be switched to public by hand in YouTube Studio.
+privacyStatus is honoured as is. YouTube confirmed on 2026-11-11 (reply to our audit form) that videos uploaded
+via the API are NOT automatically made private; the 'locked to private until audit' rule found on third-party sites is outdated.
+Use privacyStatus "public", or "private" + publishAt to schedule.
 
 Files (never commit them; .cache/ is git-ignored):
   .cache/client_secret.json   OAuth client (Desktop app) downloaded from Google Cloud Console
