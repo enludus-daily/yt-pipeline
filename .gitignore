@@ -1,7 +1,7 @@
-.venv
-.cache
-node_modules/
-work/
-output/
 *.mp4
 *.webm
+.cache
+.venv
+node_modules/
+output/
+work/
