@@ -2,7 +2,7 @@
 - background: a frame of the app's own footage, blurred and washed out
 - accent: the most vivid colour of the app icon
 """
-import colorsys, subprocess
+import colorsys, os, subprocess, tempfile
 from PIL import Image, ImageFilter
 
 W, H = 1080, 1920
@@ -13,9 +13,10 @@ def frame_bg(video, at=None, wash=0.45):
         d = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video],
                                  capture_output=True, text=True).stdout.strip() or 2)
         at = d * 0.45
-    tmp = video + f".bg-{at:.2f}.png"
-    subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", f"{at:.2f}", "-i", video, "-frames:v", "1", tmp], check=True)
-    im = Image.open(tmp).convert("RGB")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = os.path.join(td, "frame.png")
+        subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", f"{at:.2f}", "-i", video, "-frames:v", "1", tmp], check=True)
+        im = Image.open(tmp).convert("RGB")
     s = max(W / im.width, H / im.height); im = im.resize((int(im.width * s) + 1, int(im.height * s) + 1))
     l, t = (im.width - W) // 2, (im.height - H) // 2; im = im.crop((l, t, l + W, t + H))
     im = im.filter(ImageFilter.GaussianBlur(28))

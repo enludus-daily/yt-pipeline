@@ -2,6 +2,7 @@
 *.webm
 .cache
 .venv
+__pycache__/
 node_modules/
 output/
 work/
