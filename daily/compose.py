@@ -9,7 +9,7 @@ env (all text is English, written per app):
   STORE     "Coming soon to the App Store" (default) or "Free on the App Store"
   VO        directory with hook.wav / demo.wav / outro.wav (narration; optional)
   ART_DIR   this app's OWN background art (default: a blurred frame of its demo — never another app's art)
-  SOUNDS    this app's OWN music directory with bgm.mp3 (optional; default: narration only)
+  BGM       this app's OWN music file (make one with common/bgm.py <preset>; default: narration only)
 The demo is the app's own `-demo` playback recorded in CI (daily-actions ios-ci, artifact demo-video).
 """
 import os, subprocess, sys
@@ -23,7 +23,7 @@ HOOK = os.environ.get("HOOK", "An AI built this iPhone app in one day.")
 TAGLINE = os.environ.get("TAGLINE", ""); STORE = os.environ.get("STORE", "Coming soon to the App Store")
 VO = os.environ.get("VO", ""); ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 ART_DIR = os.environ.get("ART_DIR", "")  # only this app's own art; default is a blurred frame of its demo
-SND = os.environ.get("SOUNDS", "")  # only this app's own music (bgm.mp3); default: narration only
+BGM = os.environ.get("BGM", "")  # this app's own music (e.g. apps/<app>/bgm.m4a from common/bgm.py); default: narration only
 W, H = 1080, 1920; BG = (234, 242, 247); INK = (16, 32, 48); ACCENT = (232, 122, 30); BLUE = (52, 138, 180)
 F = "/usr/share/fonts/opentype/inter/Inter-{}.otf"
 font = lambda w, s: ImageFont.truetype(F.format(w), s)
@@ -100,17 +100,21 @@ open(p("list.txt"), "w").write("file 's1.mp4'\nfile 's2.mp4'\nfile 's3.mp4'\n")
 run("ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", p("list.txt"), "-c", "copy", p("video.mp4"))
 
 total = HOOK_S + dd + OUTRO_S
-ins = []; flt = []; n = 0
-if SND and os.path.exists(os.path.join(SND, "bgm.mp3")):
-    ins += ["-stream_loop", "-1", "-i", os.path.join(SND, "bgm.mp3")]; n += 1
-    flt.append(f"[1:a]atrim=0:{total:.2f},volume=0.20,afade=t=in:d=0.5,afade=t=out:st={total - 1.2:.2f}:d=1.2[m0]")
+ins, flt, n = [], [], 0
 for name, st in (("hook", 0.3), ("demo", HOOK_S + 0.4), ("outro", HOOK_S + dd + 0.3)):
     f = os.path.join(VO, f"{name}.wav") if VO else ""
     if f and os.path.exists(f):
         ins += ["-i", f]; n += 1; ms = int(st * 1000)
-        flt.append(f"[{n}:a]adelay={ms}|{ms}[m{n - 1}]")
+        flt.append(f"[{n}:a]aresample=48000,volume=1.5,adelay={ms}|{ms}[v{n}]")
 if n:
-    flt.append("".join(f"[m{i}]" for i in range(n)) + f"amix=inputs={n}:normalize=0,alimiter=limit=0.95,apad[a]")
+    flt.append("".join(f"[v{k}]" for k in range(1, n + 1)) + f"amix=inputs={n}:normalize=0,apad,atrim=0:{total:.2f},asplit[vo1][vo2]")
+if BGM and os.path.exists(BGM):
+    ins += ["-stream_loop", "-1", "-i", BGM]; k = n + 1
+    flt.append(f"[{k}:a]aresample=48000,atrim=0:{total:.2f},volume=0.55,afade=t=in:d=0.5,afade=t=out:st={total - 1.2:.2f}:d=1.2[m]")
+    flt.append("[m][vo1]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=350[duck];[duck][vo2]amix=inputs=2:normalize=0,alimiter=limit=0.95[a]" if n else "[m]anull[a]")
+elif n:
+    flt.append("[vo1]anull[a];[vo2]anullsink")
+if flt:
     run("ffmpeg", "-y", "-i", p("video.mp4"), *ins, "-filter_complex", ";".join(flt), "-map", "0:v", "-map", "[a]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", p("short.mp4"))
 else:

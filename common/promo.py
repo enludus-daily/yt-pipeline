@@ -117,7 +117,7 @@ if n:
 bgm = spec.get("bgm")
 if bgm and os.path.exists(rel(bgm)):
     ins += ["-stream_loop", "-1", "-i", rel(bgm)]; k = n + 1
-    flt.append(f"[{k}:a]aresample=48000,atrim=0:{total:.2f},volume=0.35,afade=t=in:d=0.5,afade=t=out:st={total - 1.2:.2f}:d=1.2[m]")
+    flt.append(f"[{k}:a]aresample=48000,atrim=0:{total:.2f},volume=0.55,afade=t=in:d=0.5,afade=t=out:st={total - 1.2:.2f}:d=1.2[m]")
     flt.append("[m][vo1]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=350[duck];[duck][vo2]amix=inputs=2:normalize=0,alimiter=limit=0.95[a]" if n else "[m]anull[a]")
 elif n:
     flt.append("[vo1]anull[a];[vo2]anullsink")

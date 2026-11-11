@@ -89,7 +89,7 @@ DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion."
 ## 見た目のきまり（2026-11-11 本人の指摘：「五十音マインスイーパーに引っ張られすぎ」）
 
 - 動画の背景・色・音楽は、**そのアプリ自身のもの**から作る。ほかのアプリの絵（`assets/gojuon-art/`）や BGM（`assets/gojuon-sounds/`）は、五十音マインスイーパーの動画だけに使う
-- 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はなし（ナレーションだけ）。アプリに自前の BGM があればそれを使う
+- 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はアプリごとに `common/bgm.py` で一から合成する（`python common/bgm.py <preset> apps/<app>/bgm.m4a`。プリセットはアプリの雰囲気ごと：tamahebi・umeda・calm・arcade。新しいアプリには、使い回さずにプリセットを足す）。アプリに自前の BGM があればそれを使う（StudyReel・五十音マインスイーパー）
 - チャンネルのバナーとアイコンは Enludus のロゴの色（紺・水色・オレンジ）
 
 ## 投稿
