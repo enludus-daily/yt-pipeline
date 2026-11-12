@@ -1,7 +1,23 @@
 {
-  "_doc": "AI ships an app a day: which daily app is which day. Day 1 is Tamahebi (2026-11-09); every daily app after it gets the next number. daily/compose.py reads DAY from here (set it per run).",
+  "_doc": "AI ships an app a day: which daily app is which day, in the order they were built. Day 1 is Tamahebi; every daily app after it gets the next number.",
   "days": [
-    { "day": 1, "repo": "app-20261109-tamahebi", "date": "2026-11-09", "status": "waiting for English + -demo (v1.1.0)" },
-    { "day": 2, "repo": "", "date": "2026-11-10", "status": "built tonight (first app with demo-video in CI)" }
+    {
+      "day": 1,
+      "repo": "app-20261109-tamahebi",
+      "date": "2026-11-09",
+      "status": "published 2026-11-11"
+    },
+    {
+      "day": 2,
+      "repo": "app-20261109-push-beat",
+      "date": "2026-11-09",
+      "status": "scheduled"
+    },
+    {
+      "day": 3,
+      "repo": "app-20261110-neck-balloon",
+      "date": "2026-11-10",
+      "status": "next"
+    }
   ]
 }

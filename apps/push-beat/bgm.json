@@ -1,0 +1,14 @@
+{
+  "genre": "funk",
+  "bpm": 112,
+  "root": 60,
+  "scale": "dorian",
+  "progression": [
+    0,
+    3,
+    0,
+    3
+  ],
+  "seed": 2358823369,
+  "made": "2026-11-12T01:09:36"
+}
