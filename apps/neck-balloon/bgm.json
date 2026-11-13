@@ -1,0 +1,14 @@
+{
+  "genre": "ambient",
+  "bpm": 76,
+  "root": 63,
+  "scale": "minor_pent",
+  "progression": [
+    0,
+    3,
+    4,
+    3
+  ],
+  "seed": 1548490264,
+  "made": "2026-11-13T04:32:49"
+}

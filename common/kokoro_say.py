@@ -6,5 +6,6 @@ import os, sys, soundfile as sf
 from kokoro_onnx import Kokoro
 k = Kokoro(os.environ.get("KOKORO_MODEL", ".cache/kokoro/kokoro-v1.0.onnx"), os.environ.get("KOKORO_VOICES", ".cache/kokoro/voices-v1.0.bin"))
 voice, speed, out, text = sys.argv[1], float(sys.argv[2]), sys.argv[3], sys.argv[4]
-samples, sr = k.create(text, voice=voice, speed=speed, lang="en-us")
+lang = sys.argv[5] if len(sys.argv) > 5 else "en-us"  # "ja" for Japanese voices (jf_*)
+samples, sr = k.create(text, voice=voice, speed=speed, lang=lang)
 sf.write(out, samples, sr); print(out, round(len(samples)/sr, 2))

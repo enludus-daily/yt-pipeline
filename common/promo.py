@@ -29,13 +29,26 @@ spec = json.load(open(SPEC)); base = os.path.dirname(os.path.abspath(SPEC))
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 rel = lambda p: p if os.path.isabs(p) else os.path.join(base, p)
 W, H = 1080, 1920; BG = (234, 242, 247); INK = (16, 32, 48); ACCENT = (232, 122, 30); BLUE = (52, 138, 180)
-F = "/usr/share/fonts/opentype/inter/Inter-{}.otf"; font = lambda w, s: ImageFont.truetype(F.format(w), s)
+F = "/usr/share/fonts/opentype/inter/Inter-{}.otf"
+# Japanese text needs a Japanese font (Zen Kaku Gothic New, OFL, in assets/fonts). "lang": "ja" in the spec switches to it
+FJ = os.path.join(ROOT, "assets", "fonts", "ZenKakuGothicNew-{}.ttf"); JA_W = {"Black": "Black", "Bold": "Bold", "SemiBold": "Bold", "Regular": "Medium"}
+def font(w, s):
+    if spec.get("lang") == "ja": return ImageFont.truetype(FJ.format(JA_W.get(w, "Bold")), s)
+    return ImageFont.truetype(F.format(w), s)
 os.makedirs(OUT, exist_ok=True); p = lambda n: os.path.join(OUT, n)
 def run(*a): subprocess.run(a, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 def dur(f): return float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", f], capture_output=True, text=True).stdout.strip() or 0)
 
 def wrap(d, text, f, maxw):
     out, cur = [], ""
+    if " " not in text.strip():  # Japanese: no spaces, wrap by characters (\n forces a break)
+        for part in text.split("\n"):
+            cur = ""
+            for ch in part:
+                if d.textlength(cur + ch, font=f) <= maxw: cur += ch
+                else: out.append(cur); cur = ch
+            out.append(cur)
+        return out
     for w in text.split():
         t = (cur + " " + w).strip()
         if d.textlength(t, font=f) <= maxw: cur = t
@@ -63,7 +76,7 @@ if voice:
     say = os.path.join(ROOT, "common", "kokoro_say.py")
     for i, ln in enumerate(voice["lines"]):
         f = p(f"vo-{i}.wav")
-        subprocess.run([sys.executable, say, voice.get("name", "af_bella"), str(voice.get("speed", 1.06)), f, ln["text"]],
+        subprocess.run([sys.executable, say, voice.get("name", "af_bella"), str(voice.get("speed", 1.06)), f, ln["text"]] + (["ja"] if spec.get("lang") == "ja" else []),
                        check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
         vo[i] = (ln["at"], f, dur(f))
 def vo_len(at): return max([d for a, _, d in vo.values() if a == at] or [0])
