@@ -1,0 +1,62 @@
+{
+  "recording": "rec-en.mp4",
+  "icon": "../icon.png",
+  "bgm": "../bgm.m4a",
+  "hook": {
+    "text": "Snake meets billiards. Out now!",
+    "sub": "Free on the App Store",
+    "secs": 3.0
+  },
+  "segments": [
+    {
+      "from": 4.7,
+      "to": 9.6,
+      "caption": "Pull back, then let go"
+    },
+    {
+      "from": 9.6,
+      "to": 14.6,
+      "caption": "Your trail becomes your body. Bounce off it!"
+    },
+    {
+      "from": 14.6,
+      "to": 21.5,
+      "caption": "Clear it in fewer shots for 3 stars"
+    }
+  ],
+  "outro": {
+    "name": "Tamahebi: Snake Billiards",
+    "lines": [
+      "Free on the App Store",
+      "800+ stages for iPhone"
+    ],
+    "pill": "Search \"Tamahebi\"",
+    "secs": 3.2
+  },
+  "voice": {
+    "name": "af_bella",
+    "speed": 1.06,
+    "lines": [
+      {
+        "at": "hook",
+        "text": "Snake meets billiards, and it's out now!"
+      },
+      {
+        "at": 0,
+        "text": "Pull back anywhere, then let go."
+      },
+      {
+        "at": 1,
+        "text": "Your trail becomes your body, so bounce right off it!"
+      },
+      {
+        "at": 2,
+        "text": "Clear it in fewer shots for three stars."
+      },
+      {
+        "at": "outro",
+        "text": "Tamahebi. Free on the App Store!"
+      }
+    ]
+  }
+}
