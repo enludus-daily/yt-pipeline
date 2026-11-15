@@ -1,0 +1,14 @@
+{
+  "genre": "waltz",
+  "bpm": 145,
+  "root": 61,
+  "scale": "major",
+  "progression": [
+    0,
+    3,
+    4,
+    0
+  ],
+  "seed": 764577858,
+  "made": "2026-11-15T17:50:29"
+}
