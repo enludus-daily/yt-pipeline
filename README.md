@@ -92,6 +92,8 @@ DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion."
 - 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はアプリごとに `common/bgm.py` で一から合成する。**毎回ちがう曲にする**（2026-11-11 本人：「似てるから、毎回ちゃんと作って」）：`python common/bgm.py new <app>` で、直近 5 本のアプリが使っていないジャンル（lofi・chiptune・bossa・synthwave・folk・ambient・funk・waltz）を選び、アプリ名から決まる種でテンポ・調・音階・コード進行・メロディを変える。曲は イントロ → A → B（メロディが上がる）→ A → B。`apps/<app>/bgm.m4a` と `bgm.json`（ジャンル・テンポ・調）を書く。アプリの雰囲気に合うジャンルを `--genre` で選んでよい。作った BGM はそのアプリのリポジトリの `docs/promo/bgm.m4a` にも置く。アプリに自前の BGM があればそれを使う（StudyReel・五十音マインスイーパー）
 - チャンネルのバナーとアイコンは Enludus のロゴの色（紺・水色・オレンジ）
 
+- 日本語のナレーション：`common/kokoro_say.py <jf_*の声> <速さ> <out.wav> "<文>" ja`。日本語は misaki[ja]（OpenJTalk）で音にしてから Kokoro に渡す（Kokoro の既定の espeak だと日本語が崩れる。2026-11-16 に分かった）。英字（App Store など）は読めないので、ナレーションの文はカタカナで書く（字幕は英字のままでよい）
+
 ## 公開の時刻（2026-11-11 本人：「アメリカの日中に、夜中じゃなく」）
 
 - `python publish/schedule.py` で、待ち行列の動画に公開日時を入れてから `publish/upload_queue.py` で上げる（YouTube が時刻に自分で公開する）
