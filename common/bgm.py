@@ -195,7 +195,9 @@ if __name__ == "__main__":
         x, meta = render(o.genre, o.seconds, o.seed, o.bpm, o.key); write(x, o.out); print(o.out, meta)
     else:
         recent = [d["genre"] for d in used()][-5:]
-        genre = o.genre or next(g for g in sorted(GENRES, key=lambda g: hashlib.sha1((o.app + g).encode()).hexdigest()) if g not in recent)
+        # marimba_pop and city_walk were made for Tamahebi and Umeda: never pick them for another app by default
+        APP_ONLY = {"marimba_pop", "city_walk"}
+        genre = o.genre or next(g for g in sorted(GENRES, key=lambda g: hashlib.sha1((o.app + g).encode()).hexdigest()) if g not in recent and g not in APP_ONLY)
         if genre in recent and not o.genre:
             sys.exit("no unused genre")
         if genre in recent:
