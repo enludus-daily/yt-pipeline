@@ -48,6 +48,22 @@
       "repo": "app-20261115-one-stop-riddle",
       "date": "2026-11-15",
       "status": "scheduled"
+    },
+    {
+      "day": 9,
+      "repo": "app-20261116-menu-mahjong",
+      "date": "2026-11-16",
+      "status": "scheduled 2026-11-21 12:00 ET"
+    },
+    {
+      "day": 10,
+      "repo": "app-20261117-reversi-delve",
+      "date": "2026-11-17"
+    },
+    {
+      "day": 11,
+      "repo": "app-20261118-uosagashi",
+      "date": "2026-11-18"
     }
   ]
 }

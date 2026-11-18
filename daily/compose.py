@@ -72,7 +72,7 @@ def text_cols(im, box):
     """Text colours that read on this part of the background (dark apps get light text)."""
     from PIL import ImageStat
     lum = ImageStat.Stat(im.convert("L").crop(box)).mean[0]
-    return ((16, 32, 48), (70, 90, 110), (90, 110, 130)) if lum > 140 else ((255, 255, 255), (220, 228, 236), (200, 210, 222))
+    return ((16, 32, 48), (50, 70, 90), (40, 60, 80)) if lum > 140 else ((255, 255, 255), (220, 228, 236), (200, 210, 222))
 ov = art(0).convert("RGBA"); d = ImageDraw.Draw(ov)
 center(d, 70, f"Day {DAY}: {NAME}", font("Black", 64), text_cols(ov, (0, 40, W, 160))[0])
 pill(d, 175, "Built by AI in ~1 day", font("Bold", 40), ink_on(ACC), ACC)

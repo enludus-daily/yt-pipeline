@@ -1,0 +1,14 @@
+{
+  "genre": "folk",
+  "bpm": 101,
+  "root": 58,
+  "scale": "major",
+  "progression": [
+    5,
+    3,
+    0,
+    4
+  ],
+  "seed": 3875763222,
+  "made": "2026-11-18T13:18:19"
+}
