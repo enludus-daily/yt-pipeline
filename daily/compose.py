@@ -68,17 +68,23 @@ im.save(p("hook.png"))
 
 # 2) demo overlay: caption band on top, phone recording below
 dd = dur(DEMO); DW = 820; DY = 300
+def text_cols(im, box):
+    """Text colours that read on this part of the background (dark apps get light text)."""
+    from PIL import ImageStat
+    lum = ImageStat.Stat(im.convert("L").crop(box)).mean[0]
+    return ((16, 32, 48), (70, 90, 110), (90, 110, 130)) if lum > 140 else ((255, 255, 255), (220, 228, 236), (200, 210, 222))
 ov = art(0).convert("RGBA"); d = ImageDraw.Draw(ov)
-center(d, 70, f"Day {DAY}: {NAME}", font("Black", 64), INK)
+center(d, 70, f"Day {DAY}: {NAME}", font("Black", 64), text_cols(ov, (0, 40, W, 160))[0])
 pill(d, 175, "Built by AI in ~1 day", font("Bold", 40), ink_on(ACC), ACC)
 ov.save(p("ov_demo.png"))
 
 # 3) outro card
 o = art(1); d = ImageDraw.Draw(o); ic, m = icon(340); o.paste(ic, ((W - 340) // 2, 560), m)
-y = center(d, 950, NAME, font("Black", 84), INK)
-if TAGLINE: y = center(d, y + 10, TAGLINE, font("SemiBold", 46), (70, 90, 110))
+c1, c2, c3 = text_cols(o, (0, 940, W, 1400))
+y = center(d, 950, NAME, font("Black", 84), c1)
+if TAGLINE: y = center(d, y + 10, TAGLINE, font("SemiBold", 46), c2)
 y = pill(d, y + 40, STORE, font("Bold", 48), ink_on(ACC), ACC)
-center(d, y + 30, f"Day {int(DAY) + 1} drops tomorrow. Follow along!", font("SemiBold", 40), (90, 110, 130))
+center(d, y + 30, f"Day {int(DAY) + 1} drops tomorrow. Follow along!", font("SemiBold", 40), c3)
 o.save(p("outro.png"))
 
 ENC = ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", "-an"]

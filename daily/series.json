@@ -35,13 +35,13 @@
       "day": 6,
       "repo": "app-20261113-dawn-sky",
       "date": "2026-11-13",
-      "status": ""
+      "status": "slot reserved 2026-11-18 12:00 ET (waiting for CI)"
     },
     {
       "day": 7,
       "repo": "app-20261114-squat-city",
       "date": "2026-11-14",
-      "status": ""
+      "status": "scheduled"
     },
     {
       "day": 8,

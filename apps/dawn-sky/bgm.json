@@ -1,0 +1,14 @@
+{
+  "genre": "bossa",
+  "bpm": 124,
+  "root": 61,
+  "scale": "dorian",
+  "progression": [
+    0,
+    5,
+    1,
+    4
+  ],
+  "seed": 1794290876,
+  "made": "2026-11-17T14:21:26"
+}
