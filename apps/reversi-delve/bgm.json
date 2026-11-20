@@ -1,0 +1,9 @@
+{
+  "source": "stable-audio-3",
+  "prompt": "Dark fantasy dungeon-crawl adventure with plucked harp arpeggios, glassy crystal bells and a low cello ostinato, deep frame drums and soft taiko pulses, for a mysterious, torch-lit descent into a gem-filled labyrinth.",
+  "model": "medium",
+  "seed": 1118,
+  "seconds": 40.0,
+  "made": "2026-11-20T22:21:37",
+  "license": "Stability AI Community License (generated locally with Audio Studio MCP)"
+}
