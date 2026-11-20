@@ -1,0 +1,9 @@
+{
+  "source": "stable-audio-3",
+  "prompt": "Breezy summer-morning bossa nova with warm nylon-string guitar, airy wooden flute melody, round upright bass and gentle brushed drums with a soft shaker, for a calm, sunlit pondside puzzle mood that feels patient and clever.",
+  "model": "medium",
+  "seed": 1119,
+  "seconds": 40.0,
+  "made": "2026-11-20T23:22:54",
+  "license": "Stability AI Community License (generated locally with Audio Studio MCP)"
+}
