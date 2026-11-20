@@ -1,0 +1,9 @@
+{
+  "source": "stable-audio-3",
+  "prompt": "Playful candlelit mystery waltz in a minor key with a sly harpsichord melody, pizzicato string quartet and a woody bass clarinet line over ticking woodblock clockwork percussion, for a curious, lightly spooky yet cozy word-puzzle escape through an old mansion at night.",
+  "model": "medium",
+  "seed": 1120,
+  "seconds": 38.96,
+  "made": "2026-11-20T23:33:53",
+  "license": "Stability AI Community License (generated locally with Audio Studio MCP)"
+}
