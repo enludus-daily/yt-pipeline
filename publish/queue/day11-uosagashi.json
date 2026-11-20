@@ -1,0 +1,23 @@
+{
+  "title": "Day 11: an AI made a logic puzzle where you fish #shorts",
+  "description": "Minesweeper-style logic, but you're fishing.\n\nRipple Pond is today's app in our series \"AI ships an app a day\": every day an AI builds a brand-new iPhone app from scratch, and we show you what it made.\n\nFish hide under the water instead of mines. Peek at a tile and the ripples tell you how many fish are around it. When you know one's there, switch to your rod and cast. Miss or spook the fish and you lose a line, and you only have three. Every pond can be solved by logic alone, with no coin flips, and there's a new pond every day.\n\nRipple Pond - coming soon to the App Store\n\nThe music in this video was generated for this channel with Stable Audio. Narration is a synthetic voice reading our own script.\n\nFollow for Day 12 tomorrow.\n\n#puzzle #logicpuzzle #fishing #puzzlegame #indiegame",
+  "tags": [
+    "logic puzzle",
+    "fishing game",
+    "puzzle game",
+    "number puzzle",
+    "daily puzzle",
+    "ai made app",
+    "ai app a day",
+    "iphone app",
+    "brain teaser",
+    "indie game"
+  ],
+  "categoryId": "20",
+  "privacyStatus": "private",
+  "madeForKids": false,
+  "containsSyntheticMedia": false,
+  "defaultLanguage": "en",
+  "defaultAudioLanguage": "en",
+  "publishAt": "2026-11-23T17:00:00Z"
+}
