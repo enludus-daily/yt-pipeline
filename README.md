@@ -89,7 +89,7 @@ DAY=24 NAME="Rolling Snake" HOOK="Snake, but your body is the billiard cushion."
 ## 見た目のきまり（2026-11-11 本人の指摘：「五十音マインスイーパーに引っ張られすぎ」）
 
 - 動画の背景・色・音楽は、**そのアプリ自身のもの**から作る。ほかのアプリの絵（`assets/gojuon-art/`）や BGM（`assets/gojuon-sounds/`）は、五十音マインスイーパーの動画だけに使う
-- 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はアプリごとに `common/bgm.py` で一から合成する。**毎回ちがう曲にする**（2026-11-11 本人：「似てるから、毎回ちゃんと作って」）：`python common/bgm.py new <app>` で、直近 5 本のアプリが使っていないジャンル（lofi・chiptune・bossa・synthwave・folk・ambient・funk・waltz）を選び、アプリ名から決まる種でテンポ・調・音階・コード進行・メロディを変える。曲は イントロ → A → B（メロディが上がる）→ A → B。`apps/<app>/bgm.m4a` と `bgm.json`（ジャンル・テンポ・調）を書く。アプリの雰囲気に合うジャンルを `--genre` で選んでよい。作った BGM はそのアプリのリポジトリの `docs/promo/bgm.m4a` にも置く。アプリに自前の BGM があればそれを使う（StudyReel・五十音マインスイーパー）
+- 既定：背景はそのアプリの録画をぼかしたもの、アクセントの色はアイコンのいちばん鮮やかな色（`common/look.py`）、音楽はアプリごとに `common/bgm.py` で一から合成する。**毎回ちがう曲にする**（2026-11-11 本人：「似てるから、毎回ちゃんと作って」）：`python common/bgm.py new <app>` で、直近 5 本のアプリが使っていないジャンル（lofi・chiptune・bossa・synthwave・folk・ambient・funk・waltz）を選び、アプリ名から決まる種でテンポ・調・音階・コード進行・メロディを変える。曲は イントロ → A → B（メロディが上がる）→ A → B。`apps/<app>/bgm.m4a` と `bgm.json`（ジャンル・テンポ・調）を書く。アプリの雰囲気に合うジャンルを `--genre` で選んでよい。作った BGM はそのアプリのリポジトリの `docs/promo/bgm.m4a` にも置く。**2026-11-20 から、BGM は自宅の Mac の Audio Studio MCP（Stable Audio 3）で作る**（手順・ライセンス・説明文の書き方は `docs/audio-studio-bgm.md`、取り込みは `common/bgm_import.py`）。`bgm.py` は Mac が使えないときの予備。アプリに自前の BGM があればそれを使う（StudyReel・五十音マインスイーパー）
 - チャンネルのバナーとアイコンは Enludus のロゴの色（紺・水色・オレンジ）
 
 - 日本語のナレーション：`common/kokoro_say.py <jf_*の声> <速さ> <out.wav> "<文>" ja`。日本語は misaki[ja]（OpenJTalk）で音にしてから Kokoro に渡す（Kokoro の既定の espeak だと日本語が崩れる。2026-11-16 に分かった）。英字（App Store など）は読めないので、ナレーションの文はカタカナで書く（字幕は英字のままでよい）
