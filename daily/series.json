@@ -66,6 +66,17 @@
       "repo": "app-20261118-uosagashi",
       "date": "2026-11-18",
       "status": "scheduled 2026-11-23 12:00 ET"
+    },
+    {
+      "day": 12,
+      "repo": "app-20261119-lockword",
+      "date": "2026-11-19",
+      "status": "scheduled 2026-11-24 12:00 ET"
+    },
+    {
+      "day": 13,
+      "repo": "app-20261120-lantern-isle",
+      "date": "2026-11-20"
     }
   ]
 }
