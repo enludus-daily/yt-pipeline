@@ -1,0 +1,9 @@
+{
+  "source": "stable-audio-3",
+  "prompt": "Sunny tropical island adventure groove that starts laid-back with mellow steel pan, kalimba and soft congas, then swells into an uplifting heroic night-time anthem with bright brass stabs, pulsing electric bass and driving tom-heavy drums, cozy yet brave and glowing.",
+  "model": "medium",
+  "seed": 1121,
+  "seconds": 36.55,
+  "made": "2026-11-21T12:30:42",
+  "license": "Stability AI Community License (generated locally with Audio Studio MCP)"
+}
